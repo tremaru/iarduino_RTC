@@ -1,4 +1,4 @@
-# iarduino_RTываCвыа
+# iarduino_RTC
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE5MzAzMjk5OTYsMTE2MDU1NDVdfQ==
+eyJoaXN0b3J5IjpbLTEwNzg4MjQzNzAsMTE2MDU1NDVdfQ==
 -->
