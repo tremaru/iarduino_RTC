@@ -1,13 +1,13 @@
 //	Библиотека для работы с часами реального времени: (на чипе DS1302) http://iarduino.ru/shop/Expansion-payments/rtc-modul-ds1302.html
 //                                                    (на чипе DS1307) http://iarduino.ru/shop/Expansion-payments/chasy-realnogo-vremeni-rtc-trema-modul.html
 //                                                    (на чипе DS3231) http://iarduino.ru/shop/Expansion-payments/chasy-realnogo-vremeni-ds3231.html
-//  Версия: 1.3.0
+//  Версия: 1.3.1
 //  Последнюю версию библиотеки Вы можете скачать по ссылке: http://iarduino.ru/file/235.html
 //  Подробное описание функции бибилиотеки доступно по ссылке: http://wiki.iarduino.ru/page/chasy-realnogo-vremeni-rtc-trema-modul/
 //  Библиотека является собственностью интернет магазина iarduino.ru и может свободно использоваться и распространяться!
 //  При публикации устройств или скетчей с использованием данной библиотеки, как целиком, так и её частей,
 //  в том числе и в некоммерческих целях, просим Вас опубликовать ссылку: http://iarduino.ru
-//  Автор библиотеки: Панькин Павел sajaem@narod.ru
+//  Автор библиотеки: Панькин Павел
 //  Если у Вас возникли технические вопросы, напишите нам: shop@iarduino.ru
 
 #ifndef iarduino_RTC_h																						//

@@ -5,7 +5,12 @@
 		#define iarduino_I2C_SW														//	Объявляем константу iarduino_I2C_SW					- Возможна программная реализация шины I2C.
 #if (!defined(pin_SW_SDA) || !defined(pin_SW_SCL))									//	Если выводы не определены пользователем, то ...
 		#undef  iarduino_I2C_SW														//		Отменяем объявление константы iarduino_I2C_SW	- Программная реализация шины I2C не возможна (так как выводы не указаны).
-	#if defined(TwoWire_h)															//	Проверяем не подключена ли библиотека Wire.
+	#if defined(ESP8266) || defined(ESP32)											//	Если используются указанные платы, то ...
+		#include <Wire.h>															//		Подключаем библиотеку Wire.
+		#define pin_SW_SDA 255														//		№ вывода SDA не определён
+		#define pin_SW_SCL 255														//		№ вывода SCL не определён
+		#define iarduino_I2C_TW														//		Объявляем константу iarduino_I2C_TW				- Будет использована аппаратная реализация шины I2C под управлением библиотеки Wire.
+	#elif defined(TwoWire_h)														//	Проверяем не подключена ли библиотека Wire.
 		#define pin_SW_SDA 255														//		№ вывода SDA не определён
 		#define pin_SW_SCL 255														//		№ вывода SCL не определён
 		#define iarduino_I2C_TW														//		Объявляем константу iarduino_I2C_TW				- Будет использована аппаратная реализация шины I2C под управлением библиотеки Wire.
