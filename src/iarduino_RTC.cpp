@@ -41,7 +41,7 @@ char*	iarduino_RTC::gettime(const char* i){
 }
 
 //			Заполняем значением определённую позицию блока памяти:
-void		iarduino_RTC::funcFillChar(uint8_t i, uint8_t j, uint8_t n, uint8_t k){							//	(данные, тип данных, позиция для вставки, мигание)
+void		iarduino_RTC::funcFillChar(uint8_t i, uint8_t j, uint8_t n, uint8_t k){							//													(данные, тип данных, позиция для вставки, мигание)
 			bool f=valBlink==k; if((millis()%valFrequency)<(valFrequency/2)){f=false;}						//	Устанавливаем флаг мигания, если значение valBlink равно значению параметра k
 			switch (j){
 				/* 1 знак	*/	case 0: if(i>6 ){i=6; }	charReturn[n]=f?32:i+48;																																		break;
@@ -59,15 +59,37 @@ void	iarduino_RTC::settime(int i1, int i2, int i3, int i4, int i5, int i6, int i
 			funcSetMoreTime();																				//	Корректируем переменные не читаемые из модуля	(hours, midday)
 }
 
+//		Установка даты и времени от начала эпохи Unix
+void	iarduino_RTC::settimeUnix(uint32_t i){																//															(сек)
+			uint32_t j;	uint8_t k; bool f=true;																//	Объявляем временные переменные.
+			seconds		=  i          % 60;																	//  Получаем текущее значение секунд.						(остаток от деления секунд прошедших с начала эпохи Unix на количество секунд в минуте)
+			i			= (i-seconds) / 60;																	//  Получаем количество минут прошедших с начала эпохи Unix.
+			minutes		=  i          % 60;																	//  Получаем текущее значение минут.						(остаток от деления минут  прошедших с начала эпохи Unix на количество минут в часе)
+			i			= (i-minutes) / 60;																	//  Получаем количество часов прошедших с начала эпохи Unix.
+			Hours		=  i          % 24;																	//  Получаем текущее значение часов.						(остаток от деления часов  прошедших с начала эпохи Unix на количество часов в дне)
+			i			= (i-Hours)   / 24;																	//  Получаем количество  дней прошедших с начала эпохи Unix.
+			j			=  0; while((((j+1)*365)+((j+2)/4))<=i){j++;}										//	Получаем количество   лет прошедших с начала эпохи Unix.
+			weekday		= (i+4) % 7;																		//	Получаем текущий день недели.							(0-воскресенье, 1-понедельник, ... , 6-суббота)
+			i			=  i - (j*365) - ((j+1)/4);															//	Получаем количество  дней прошедших в текущем году.
+			valCentury	= ((1970+j)/100)+1;																	//	Получаем текущий век.
+			year		=  (1970+j)%100;																	//	Получаем две последние цифры текущего года.
+			k			= ((1970+j)%4)==0?29:28;															//	Получаем количество дней в феврале текущего года.
+			month		= 0; while(f){month++; j=month; j=(((j+1)%2)^(j<8))?31:(j==2?k:30); if(i>=j){i-=j;}else{f=false;}}
+			day			= i+1;																				//	Получаем текущий день.
+		//	Устанавливаем время:
+			settime(seconds, minutes, Hours, day, month, year, weekday);
+}
+
 //		Чтение даты и времени в переменные из регистров модуля:
 void	iarduino_RTC::funcReadTime(void){																	//													(без параметров)
-			seconds = arrCalculationTime[0] = funcConvertCodeToNum(objClass -> funcReadTimeIndex(0));		//	Получаем секунды
-			minutes = arrCalculationTime[1] = funcConvertCodeToNum(objClass -> funcReadTimeIndex(1));		//	Получаем минуты
-			Hours   = arrCalculationTime[2] = funcConvertCodeToNum(objClass -> funcReadTimeIndex(2));		//	Получаем часы
-			day     = arrCalculationTime[3] = funcConvertCodeToNum(objClass -> funcReadTimeIndex(3));		//	Получаем день
-			month   = arrCalculationTime[4] = funcConvertCodeToNum(objClass -> funcReadTimeIndex(4));		//	Получаем месяц
-			year    = arrCalculationTime[5] = funcConvertCodeToNum(objClass -> funcReadTimeIndex(5));		//	Получаем год
-			weekday = arrCalculationTime[6] = funcConvertCodeToNum(objClass -> funcReadTimeIndex(6))-1;		//	Получаем день недели							(в регистре значение от 1 до 7, а в переменной от 0 до 6)
+			seconds    = arrCalculationTime[0] = funcConvertCodeToNum(objClass -> funcReadTimeIndex(0));	//	Получаем секунды
+			minutes    = arrCalculationTime[1] = funcConvertCodeToNum(objClass -> funcReadTimeIndex(1));	//	Получаем минуты
+			Hours      = arrCalculationTime[2] = funcConvertCodeToNum(objClass -> funcReadTimeIndex(2));	//	Получаем часы
+			day        = arrCalculationTime[3] = funcConvertCodeToNum(objClass -> funcReadTimeIndex(3));	//	Получаем день
+			month      = arrCalculationTime[4] = funcConvertCodeToNum(objClass -> funcReadTimeIndex(4));	//	Получаем месяц
+			year       = arrCalculationTime[5] = funcConvertCodeToNum(objClass -> funcReadTimeIndex(5));	//	Получаем год
+			weekday    = arrCalculationTime[6] = funcConvertCodeToNum(objClass -> funcReadTimeIndex(6))-1;	//	Получаем день недели							(в регистре значение от 1 до 7, а в переменной от 0 до 6)
+			Unix       = funcCalculationUnix();																//  Получаем количество секунд						(прошедших с начала эпохи Unix)
 			valRequest = millis();																			//	Сохраняем время данного запроса
 }
 
@@ -81,6 +103,7 @@ void	iarduino_RTC::funcWriteTime(int i1, int i2, int i3, int i4, int i5, int i6,
 			if(i6<=99 && i6>=0){objClass -> funcWriteTimeIndex(5, funcConvertNumToCode(i6  ));}				//	Сохраняем год
 			if(i7<= 6 && i7>=0){objClass -> funcWriteTimeIndex(6, funcConvertNumToCode(i7+1));}				//	Сохраняем день недели							(в регистре значение от 1 до 7, а в переменной от 0 до 6)
 }
+
 //		Расчёт времени без обращения к модулю:
 void	iarduino_RTC::funcCalculationTime(void){															//													(без параметров)
 			uint32_t i=(millis()-valRequest)/1000;															//	Определяем количество секунд					(прошедших после последнего обращения к модулю)
@@ -93,4 +116,19 @@ void	iarduino_RTC::funcCalculationTime(void){															//													(бе
 			i+=arrCalculationTime[3]; day     = i%(j+1);	i/=(j+1);	day+=i;								//	Добавляем к прошедним дням     (i) посление прочитанные дни     (arrCalculationTime[3]), результатом будет остаток, а значение i превращаем в месяцы
 			i+=arrCalculationTime[4]; month   = i%13;		i/=13;		month+=i;							//	Добавляем к прошедним месяцам  (i) посление прочитанные месяцы  (arrCalculationTime[4]), результатом будет остаток, а значение i превращаем в годы
 			i+=arrCalculationTime[5]; year    = i%100;														//	Добавляем к прошедним годам    (i) посление прочитанные годы    (arrCalculationTime[5]), результатом будет остаток, а значение i превращаем в дни
+			                          Unix    = funcCalculationUnix();										//  Получаем количество секунд прошедших с начала эпохи Unix
+}
+
+//		Расчёт количества cекунд прошедших с начала эпохи Unix:
+uint32_t iarduino_RTC::funcCalculationUnix(void){															//													(без параметров)
+			uint32_t i;																						//	Объявляем  переменную для хранения результата.	(рассчёты производятся из значений переменных: seconds, minutes, Hours, day, month, year и valCentury).
+			uint32_t j = (uint32_t)(valCentury-1) * 100 + year;												//	Определяем текущий год с учётом века.			(valCentury - век, year - последние два знака текущего года).
+			i  = j - 1970;																					//  Определяем количество прошедших лет				(с 01.01.1970 г.)
+			i  = i * 365 + ((i+1)/4);																		//  Определяем количество дней в прошедших годах	((i+1)/4) - количество прошедших високосных лет (без учёта текущего года).
+			i += (month-1)*30 + ( (month + (month<9?0:1) )/2 );												//  Добавляем  количество дней в прошедших месяцах	((month+(month<9?0:1))/2) - количество прошедших месяцев текущего года, содержащих 31 день.
+			i -= month>2? (j%4==0?1:2) : 0;																	//  Вычитаем   1 или 2 дня из февраля текущего года	((month>2) - если февраль уже прошел, j%4==0 - если текущий год високосный)
+			i += day-1;																						//  Добавляем  количество прошедших дней этого месяца
+			i *= 86400;																						//	Получаем   количество секунд прошедших дней
+			i += (uint32_t)Hours * 3600 + (uint32_t)minutes * 60 + seconds;									//	Добавляем  количество секунд текущего дня
+			return i;																						//	Возвращаем результат
 }

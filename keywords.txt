@@ -9,6 +9,8 @@
 	begin	KEYWORD2
 	settime	KEYWORD2
 	gettime	KEYWORD2
+	settimeUnix	KEYWORD2
+	gettimeUnix	KEYWORD2
 	blinktime	KEYWORD2
 	period	KEYWORD2
 	seconds	KEYWORD2
@@ -20,6 +22,7 @@
 	weekday	KEYWORD2
 	month	KEYWORD2
 	year	KEYWORD2
+	Unix	KEYWORD2
 #	####################################################
 #	КОНСТАНТЫ:								   (LITERAL1)
 	RTC_DS1302	LITERAL1
