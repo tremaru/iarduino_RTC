@@ -58,10 +58,21 @@ void	iarduino_RTC::settime(int i1, int i2, int i3, int i4, int i5, int i6, int i
 			funcReadTime();																					//	Читаем дату и время из регистров модуля
 			funcSetMoreTime();																				//	Корректируем переменные не читаемые из модуля	(hours, midday)
 }
+void	iarduino_RTC::settime(String i){char j[i.length()+1]; i.toCharArray(j, i.length()); j[i.length()]=0; return gettime(j);}
+void	iarduino_RTC::settime(const char* str){																//	str =	"Mon Oct 02 15:29:23 2023" (24 символа).
+			settime(	(str[17]-'0')*10+(str[18]-'0'),														//	сек :	"00"..."59"					=> 0...59
+						(str[14]-'0')*10+(str[15]-'0'),														//	мин :	"00"..."59"					=> 0...59
+						(str[11]-'0')*10+(str[12]-'0'),														//	час :	"00"..."23"					=> 0...23
+						(str[8]=='0')||(str[8]==' ')?(str[9]-'0'):(str[8]-'0')*10+(str[9]-'0'),				//	день:	"01"..."31" или " 1"..."31"	=> 1...31
+						((int)memmem(&charDayMon[21],36,&str[4],3)+3-(int)&charDayMon[21])/3,				//	мес :	"Jan"..."Dec"				=> 1...12
+						(str[22]-'0')*10+(str[23]-'0'),														//	год :	"0000"..."9999"				=> 0...99
+						((int)memmem(charDayMon,21,str,3)-(int)&charDayMon[0])/3);							//	д/н :	"Sun"..."Sat"				=> 0...6
+}
 
 //		Установка даты и времени от начала эпохи Unix
 void	iarduino_RTC::settimeUnix(uint32_t i){																//															(сек)
 			uint32_t j;	uint8_t k; bool f=true;																//	Объявляем временные переменные.
+			i			+= valTimeZone*3600;																//	Смещаем часовой пояс.
 			seconds		=  i          % 60;																	//  Получаем текущее значение секунд.						(остаток от деления секунд прошедших с начала эпохи Unix на количество секунд в минуте)
 			i			= (i-seconds) / 60;																	//  Получаем количество минут прошедших с начала эпохи Unix.
 			minutes		=  i          % 60;																	//  Получаем текущее значение минут.						(остаток от деления минут  прошедших с начала эпохи Unix на количество минут в часе)
@@ -130,5 +141,6 @@ uint32_t iarduino_RTC::funcCalculationUnix(void){															//													(
 			i += day-1;																						//  Добавляем  количество прошедших дней этого месяца
 			i *= 86400;																						//	Получаем   количество секунд прошедших дней
 			i += (uint32_t)Hours * 3600 + (uint32_t)minutes * 60 + seconds;									//	Добавляем  количество секунд текущего дня
+			i -= valTimeZone*3600;																			//	Смещаем часовой пояс.
 			return i;																						//	Возвращаем результат
 }

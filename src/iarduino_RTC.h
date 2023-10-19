@@ -4,7 +4,7 @@
 //                                                    (на чипе DS3231) https://iarduino.ru/shop/Expansion-payments/chasy-realnogo-vremeni-ds3231.html
 //                                                                     https://iarduino.ru/shop/Expansion-payments/chasy-realnogo-vremeni-rtc-trema-modul-v2-0.html
 //                                                    (на чипе RX8025)
-//  Версия: 2.0.0
+//  Версия: 2.0.1
 //  Последнюю версию библиотеки Вы можете скачать по ссылке: https://iarduino.ru/file/235.html
 //  Подробное описание функции бибилиотеки доступно по ссылке: https://wiki.iarduino.ru/page/chasy-realnogo-vremeni-rtc-trema-modul/
 //  Библиотека является собственностью интернет магазина iarduino.ru и может свободно использоваться и распространяться!
@@ -65,8 +65,11 @@ class iarduino_RTC{																							//
 		char*	gettime		(String);																		//	Объявляем  функцию «дублёр» получения даты и времени из переменных	(строка с параметрами)
 		char*	gettime		(const char*);																	//	Объявляем  функцию получения даты и времени ввиде строки			(строка с параметрами)
 		void	settime		(int, int=-1, int=-1, int=-1, int=-1, int=-1, int=-1);							//	Объявляем  функцию установки даты и времени							(сек, мин, час, день, мес, год, день_недели)
+		void	settime		(String);																		//	Объявляем  функцию «дублёр» установки даты и времени из строки		(строка "Mon Oct 02 15:29:23 2023" или макрос __TIMESTAMP__)
+		void	settime		(const char*);																	//	Объявляем  функцию установки даты и времени из строки				(строка "Mon Oct 02 15:29:23 2023" или макрос __TIMESTAMP__)
 	   uint32_t	gettimeUnix	(void)					{gettime(""); return Unix;}								//	Определяем функцию получения cекунд прошедших с начала эпохи Unix	(без параметров)
 		void	settimeUnix	(uint32_t);																		//	Объявляем  функцию установки cекунд прошедших с начала эпохи Unix	(сек)
+		void	settimezone	(int8_t i)				{valTimeZone=i;}										//	Определяем функцию установки часового пояса							(±12)
 																											//
 	/**	Переменные доступные для пользователя **/															//
 		uint8_t	seconds					=	0;																//	Секунды			0-59
@@ -92,6 +95,7 @@ class iarduino_RTC{																							//
 		uint8_t	valCentury				=	21;																//	Определяем переменную для хранения текущего века					(по умолчанию 21 век)
 	   uint16_t	valPeriod				=	0;																//	Определяем минимальный период опроса модуля							(в минутах, от 00 до 255)
 	   uint32_t	valRequest				=	0;																//	Определяем время последнего чтения регистров времени
+		int8_t	valTimeZone				=	0;																//	Часовой пояс для функций set/get timeUnix().						(в часах ±12)
 	private:																								//
 	/**	Внутренние функции **/																				//
 		void	funcReadTime			(void);																//	Объявляем функцию чтения даты и времени из регистров модуля			(без параметров)
