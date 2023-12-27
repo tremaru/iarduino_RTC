@@ -4,7 +4,7 @@
 //                                                    (на чипе DS3231) https://iarduino.ru/shop/Expansion-payments/chasy-realnogo-vremeni-ds3231.html
 //                                                                     https://iarduino.ru/shop/Expansion-payments/chasy-realnogo-vremeni-rtc-trema-modul-v2-0.html
 //                                                    (на чипе RX8025)
-//  Версия: 2.0.1
+//  Версия: 2.0.2
 //  Последнюю версию библиотеки Вы можете скачать по ссылке: https://iarduino.ru/file/235.html
 //  Подробное описание функции бибилиотеки доступно по ссылке: https://wiki.iarduino.ru/page/chasy-realnogo-vremeni-rtc-trema-modul/
 //  Библиотека является собственностью интернет магазина iarduino.ru и может свободно использоваться и распространяться!

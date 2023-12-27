@@ -58,7 +58,7 @@ void	iarduino_RTC::settime(int i1, int i2, int i3, int i4, int i5, int i6, int i
 			funcReadTime();																					//	Читаем дату и время из регистров модуля
 			funcSetMoreTime();																				//	Корректируем переменные не читаемые из модуля	(hours, midday)
 }
-void	iarduino_RTC::settime(String i){char j[i.length()+1]; i.toCharArray(j, i.length()); j[i.length()]=0; return gettime(j);}
+void	iarduino_RTC::settime(String i){char j[i.length()+1]; i.toCharArray(j, i.length()); j[i.length()]=0; gettime(j);}
 void	iarduino_RTC::settime(const char* str){																//	str =	"Mon Oct 02 15:29:23 2023" (24 символа).
 			settime(	(str[17]-'0')*10+(str[18]-'0'),														//	сек :	"00"..."59"					=> 0...59
 						(str[14]-'0')*10+(str[15]-'0'),														//	мин :	"00"..."59"					=> 0...59
