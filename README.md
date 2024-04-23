@@ -1,7 +1,7 @@
 
 [![](https://iarduino.ru/img/logo.svg)](https://iarduino.ru)[![](https://wiki.iarduino.ru/img/git-shop.svg?3)](https://iarduino.ru) [![](https://wiki.iarduino.ru/img/git-wiki.svg?2)](https://wiki.iarduino.ru) [![](https://wiki.iarduino.ru/img/git-lesson.svg?2)](https://lesson.iarduino.ru)[![](https://wiki.iarduino.ru/img/git-forum.svg?2)](http://forum.trema.ru)
 
-# iarduino_RTC [СКАЧАТЬ](https://github.com/tremaru/iarduino_RTC/archive/1.2.1.zip)
+# iarduino_RTC 
 Библиотека позволяет читать и записывать время RTC модулей на базе чипов: DS1302, [DS1307](http://iarduino.ru/shop/Expansion-payments/chasy-realnogo-vremeni-rtc-trema-modul.html),  [DS3231](http://iarduino.ru/shop/Expansion-payments/chasy-realnogo-vremeni-rtc-trema-modul-v2-0.html), ...  
 Преимуществом данной библиотеки является удобная реализация получения времени.
 > Подробнее про установку библиотеки читайте в нашей [инструкции](https://wiki.iarduino.ru/page/Installing_libraries/).
