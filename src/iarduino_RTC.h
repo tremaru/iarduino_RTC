@@ -4,7 +4,7 @@
 //                                                    (на чипе DS3231) https://iarduino.ru/shop/Expansion-payments/chasy-realnogo-vremeni-ds3231.html
 //                                                                     https://iarduino.ru/shop/Expansion-payments/chasy-realnogo-vremeni-rtc-trema-modul-v2-0.html
 //                                                    (на чипе RX8025)
-//  Версия: 2.0.2
+//  Версия: 2.0.3
 //  Последнюю версию библиотеки Вы можете скачать по ссылке: https://iarduino.ru/file/235.html
 //  Подробное описание функции бибилиотеки доступно по ссылке: https://wiki.iarduino.ru/page/chasy-realnogo-vremeni-rtc-trema-modul/
 //  Библиотека является собственностью интернет магазина iarduino.ru и может свободно использоваться и распространяться!
@@ -24,11 +24,19 @@
 #include <WProgram.h>																						//
 #endif																										//
 																											//
+#include "iarduino_RTC_I2C.h"																				//	Подключаем библиотеку выбора реализации шины I2C.
 #include "memorysaver.h"																					//	Подключаем файл «хранитель памяти»									(внутри файла есть комментарий поясняющий как сэкономить мапять)
+																											//
+#if defined(TwoWire_h) || defined(__ARDUINO_WIRE_IMPLEMENTATION__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega1284P__) || defined(__AVR_ATmega2560__) || defined(ESP8266) || defined(ESP32) || defined(ARDUINO_ARCH_RP2040) || defined(RENESAS_CORTEX_M4) // Если подключена библиотека Wire или платы её поддерживают...
+#include <Wire.h>																							//	Разрешаем использовать библиотеку Wire в данной библиотеке.
+#endif																										//
+#if defined( iarduino_I2C_Software_h )																		//	Если библиотека iarduino_I2C_Software подключена в скетче...
+#include <iarduino_I2C_Software.h>																			//	Разрешаем использовать библиотеку iarduino_I2C_Software в данной библиотеке.
+#endif																										//
 																											//
 class iarduino_RTC_BASE{																					//	Объявляем полиморфный класс
 	public:																									//
-		virtual void	begin				(void);															//	Объявляем функцию инициализации модуля								(без параметров)
+		virtual void	begin				(iarduino_I2C_Select*);											//	Объявляем функцию инициализации модуля								(без параметров)
 		virtual uint8_t	funcReadTimeIndex	(uint8_t);														//	Объявляем функцию чтения 1 значения из регистров даты и времени		(0-секунды / 1-минуты / 2-часы / 3-день / 4-месяц / 5-год / 6-день недели)
 		virtual void	funcWriteTimeIndex	(uint8_t, uint8_t);												//	Объявляем функцию записи 1 значения в  регистры  даты и времени		(0-секунды / 1-минуты / 2-часы / 3-день / 4-месяц / 5-год / 6-день недели, значение)
 };																											//
@@ -44,21 +52,26 @@ class iarduino_RTC{																							//
 		iarduino_RTC(uint8_t i, uint8_t j=SS, uint8_t k=SCK, uint8_t n=MOSI){								//	Конструктор основного класса										(название [, вывод SS/RST [, вывод SCK/CLK [, вывод MOSI/DAT]]])
 			switch(i){																						//	Тип выбранного модуля
 				#ifdef RTC_ENABLE_DS1302																	//
-				case RTC_DS1302: objClass = new iarduino_RTC_DS1302(j,k,n); break;							//	Если используется модуль на базе чипа DS1302, то присваеиваем указателю objClass ссылку на новый объект производного класса iarduino_RTC_DS1302 переопределяя на него все виртуальные функции полиморфного класса iarduino_RTC_BASE
+				case RTC_DS1302: objClass = new iarduino_RTC_DS1302(j,k,n); break;							//	Если используется модуль на базе чипа DS1302, то присваиваем указателю objClass ссылку на новый объект производного класса iarduino_RTC_DS1302 переопределяя на него все виртуальные функции полиморфного класса iarduino_RTC_BASE
 				#endif																						//
 				#ifdef RTC_ENABLE_DS1307																	//
-				case RTC_DS1307: objClass = new iarduino_RTC_DS1307; break;									//	Если используется модуль на базе чипа DS1307, то присваеиваем указателю objClass ссылку на новый объект производного класса iarduino_RTC_DS1307 переопределяя на него все виртуальные функции полиморфного класса iarduino_RTC_BASE
+				case RTC_DS1307: objClass = new iarduino_RTC_DS1307; break;									//	Если используется модуль на базе чипа DS1307, то присваиваем указателю objClass ссылку на новый объект производного класса iarduino_RTC_DS1307 переопределяя на него все виртуальные функции полиморфного класса iarduino_RTC_BASE
 				#endif																						//
 				#ifdef RTC_ENABLE_DS3231																	//
-				case RTC_DS3231: objClass = new iarduino_RTC_DS3231; break;									//	Если используется модуль на базе чипа DS3231, то присваеиваем указателю objClass ссылку на новый объект производного класса iarduino_RTC_DS3231 переопределяя на него все виртуальные функции полиморфного класса iarduino_RTC_BASE
+				case RTC_DS3231: objClass = new iarduino_RTC_DS3231; break;									//	Если используется модуль на базе чипа DS3231, то присваиваем указателю objClass ссылку на новый объект производного класса iarduino_RTC_DS3231 переопределяя на него все виртуальные функции полиморфного класса iarduino_RTC_BASE
 				#endif																						//
 				#ifdef RTC_ENABLE_RX8025																	//
-				case RTC_RX8025: objClass = new iarduino_RTC_RX8025; break;									//	Если используется модуль на базе чипа RX8025, то присваеиваем указателю objClass ссылку на новый объект производного класса iarduino_RTC_RX8025 переопределяя на него все виртуальные функции полиморфного класса iarduino_RTC_BASE
+				case RTC_RX8025: objClass = new iarduino_RTC_RX8025; break;									//	Если используется модуль на базе чипа RX8025, то присваиваем указателю objClass ссылку на новый объект производного класса iarduino_RTC_RX8025 переопределяя на него все виртуальные функции полиморфного класса iarduino_RTC_BASE
 				#endif																						//
-			}																								//
+			}	                 selI2C   = new iarduino_I2C_Select;										//	Переопределяем указатель selI2C на объект производного класса iarduino_I2C_Select.
 		}																									//
 	/**	Пользовательские функции **/																		//
-		void	begin		(void)					{objClass -> begin(); gettime();}						//	Определяем функцию инициализации модуля								(без параметров)
+		#if defined(TwoWire_h) || defined(__ARDUINO_WIRE_IMPLEMENTATION__)									//	Если подключена библиотека Wire.h
+		bool begin (TwoWire* i=&Wire ){ selI2C->begin(i); objClass->begin((iarduino_I2C_Select*)selI2C); gettime(); }				//	Определяем функцию инициализации модуля (Параметр: объект для работы с аппаратной шиной I2C).
+		#endif																								//
+		#if defined(iarduino_I2C_Software_h)																//	Если подключена библиотека iarduino_I2C_Software.h
+		bool begin (SoftTwoWire* i   ){ selI2C->begin(i); objClass->begin((iarduino_I2C_Select*)selI2C); gettime(); }				//	Определяем функцию инициализации модуля (Параметр: объект для работы с программной шиной I2C).
+		#endif																								//
 		void	period		(uint8_t i)				{valPeriod=i; valPeriod*=60000;}						//	Определяем функцию задания минимального периода обращения к модулю	(i = период в минутах)
 		void	blinktime	(uint8_t i, float j=1)	{valBlink=i; valFrequency=uint32_t(1000/j);}			//	Определяем функцию позволяющую мигать одним из параметров времени	(i = 0-нет / 1-сек / 2-мин / 3-час / 4-день / 5-мес / 6-год / 7-день_недели / 8-полдень , j = частота мигания в Гц)
 		void	gettime		(void)					{gettime("");}											//	Определяем функцию получения даты и времени из переменных			(без параметров)
@@ -84,7 +97,8 @@ class iarduino_RTC{																							//
 	   uint32_t	Unix					=	0;																//	Секунды			прошедшие с начала эпохи Unix						(01.01.1970 00:00:00 GMT)
 																											//
 	/**	Внутренние переменные **/																			//
-		iarduino_RTC_BASE*	objClass;																		//	Объявляем указатель на объект полиморфного класса					(функции данного класса будут переопределены, т.к. указателю будет присвоена ссылка на производный класс)
+		iarduino_RTC_BASE*					objClass;														//	Объявляем указатель на объект полиморфного класса					(функции данного класса будут переопределены, т.к. указателю будет присвоена ссылка на производный класс)
+		iarduino_I2C_VirtualSelect*			selI2C;															//	Объявляем указатель на объект полиморфного класса					(функции данного класса будут переопределены, т.к. указателю будет присвоена ссылка на производный класс)
 		char*	charReturn				=	(char*) malloc(1);												//	Определяем указатель на символьную область памяти в 1 байт			(указатель будет ссылаться на строку вывода времени)
   const char* 	charInput				=	"waAdhHimsyMDY";												//	Определяем константу-строку с символами требующими замены			(данные символы заменяются функцией gettime на значение времени)
   const char*	charMidday				=	"ampmAMPM";														//	Определяем константу-строку для вывода полудня						(am / pm / AM / PM)
@@ -106,6 +120,7 @@ class iarduino_RTC{																							//
 		void	funcCalculationTime		(void);																//	Объявляем функцию расчёта времени без обращения к модулю			(без параметров)
 	   uint32_t	funcCalculationUnix		(void);																//	Объявляем функцию расчёта cекунд прошедших с начала эпохи Unix		(без параметров)
 		void	funcFillChar			(uint8_t, uint8_t, uint8_t, uint8_t);								//	Объявляем функцию заполнения строки вывода времени					(данные, тип данных, позиция для вставки, мигание)
+		int		funcDayMon				(const char*);														//	Объявляем функцию преобразования названия дня или месяца в число	(строка "Mon" ... "Sun" / "Jan" ... "Dec")
 };																											//
 																											//
 #endif																										//
