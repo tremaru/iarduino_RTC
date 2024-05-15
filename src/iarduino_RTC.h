@@ -4,7 +4,7 @@
 //                                                    (на чипе DS3231) https://iarduino.ru/shop/Expansion-payments/chasy-realnogo-vremeni-ds3231.html
 //                                                                     https://iarduino.ru/shop/Expansion-payments/chasy-realnogo-vremeni-rtc-trema-modul-v2-0.html
 //                                                    (на чипе RX8025)
-//  Версия: 2.0.3
+//  Версия: 2.0.4
 //  Последнюю версию библиотеки Вы можете скачать по ссылке: https://iarduino.ru/file/235.html
 //  Подробное описание функции бибилиотеки доступно по ссылке: https://wiki.iarduino.ru/page/chasy-realnogo-vremeni-rtc-trema-modul/
 //  Библиотека является собственностью интернет магазина iarduino.ru и может свободно использоваться и распространяться!
@@ -67,10 +67,10 @@ class iarduino_RTC{																							//
 		}																									//
 	/**	Пользовательские функции **/																		//
 		#if defined(TwoWire_h) || defined(__ARDUINO_WIRE_IMPLEMENTATION__)									//	Если подключена библиотека Wire.h
-		bool begin (TwoWire* i=&Wire ){ selI2C->begin(i); objClass->begin((iarduino_I2C_Select*)selI2C); gettime(); }				//	Определяем функцию инициализации модуля (Параметр: объект для работы с аппаратной шиной I2C).
+		bool begin (TwoWire* i=&Wire ){ selI2C->begin(i); objClass->begin((iarduino_I2C_Select*)selI2C); gettime(); }	//	Определяем функцию инициализации модуля (Параметр: объект для работы с аппаратной шиной I2C).
 		#endif																								//
 		#if defined(iarduino_I2C_Software_h)																//	Если подключена библиотека iarduino_I2C_Software.h
-		bool begin (SoftTwoWire* i   ){ selI2C->begin(i); objClass->begin((iarduino_I2C_Select*)selI2C); gettime(); }				//	Определяем функцию инициализации модуля (Параметр: объект для работы с программной шиной I2C).
+		bool begin (SoftTwoWire* i   ){ selI2C->begin(i); objClass->begin((iarduino_I2C_Select*)selI2C); gettime(); }	//	Определяем функцию инициализации модуля (Параметр: объект для работы с программной шиной I2C).
 		#endif																								//
 		void	period		(uint8_t i)				{valPeriod=i; valPeriod*=60000;}						//	Определяем функцию задания минимального периода обращения к модулю	(i = период в минутах)
 		void	blinktime	(uint8_t i, float j=1)	{valBlink=i; valFrequency=uint32_t(1000/j);}			//	Определяем функцию позволяющую мигать одним из параметров времени	(i = 0-нет / 1-сек / 2-мин / 3-час / 4-день / 5-мес / 6-год / 7-день_недели / 8-полдень , j = частота мигания в Гц)
