@@ -40,10 +40,10 @@
 /**																												//
 	public:																										//
 	#if defined(TwoWire_h) || defined(__ARDUINO_WIRE_IMPLEMENTATION__)											//	Если подключена библиотека Wire.h
-		bool begin (TwoWire* i=&Wire ){ selI2C->begin(i); return _begin(); }									//	Определяем функцию инициализации модуля (Параметр: объект для работы с аппаратной шиной I2C).
+		bool begin (TwoWire* i=&Wire ){ selI2C->init(i); selI2C->begin(); ваш код; }							//	Определяем функцию инициализации модуля (Параметр: объект для работы с аппаратной шиной I2C).
 	#endif																										//
 	#if defined(iarduino_I2C_Software_h)																		//	Если подключена библиотека iarduino_I2C_Software.h
-		bool begin (SoftTwoWire* i   ){ selI2C->begin(i); return _begin(); }									//	Определяем функцию инициализации модуля (Параметр: объект для работы с программной шиной I2C).
+		bool begin (SoftTwoWire* i   ){ selI2C->init(i); selI2C->begin(); ваш код; }							//	Определяем функцию инициализации модуля (Параметр: объект для работы с программной шиной I2C).
 	#endif																										//
 **/																												//
 																												//
@@ -52,21 +52,22 @@
 																												//
 //	Теперь в ВАШЕЙ библиотеке доступны следующие функции данной библиотеки:										//
 /**																												//
-	void	begin			(ссылка на объект класса TwoWire или SoftTwoWire [,uint8_t адрес]     );			//	Инициализация работы по аппаратной или программной шине I2C. Если адрес не указан, то в качестве мастера.
-	void	begin			(                                                [ uint8_t адрес]     );			//	Переинициализация ранее выбранной шины I2C. Если адрес не указан, то в качестве мастера.
-	uint8_t	getPinSDA		(void                                                                 );			//	Получение номера вывода SDA.
-	uint8_t	getPinSCL		(void                                                                 );			//	Получение номера вывода SCL.
-	void	setWireTimeout	([uint32_t время в мкс]                                               );			//	Изменение таймаута ожидания мастером ведомого в мкс. Если параметра нет, то использовать значение по умолчанию.
-	void	setClock		(uint32_t скорость                                                    );			//	Изменение скорости передачи данных в Гц.
-	bool	checkAddress	(uint8_t адрес_модуля                                                 );			//	Проверка наличия ведомого с указанным адресом.
-	bool	readBytes		(uint8_t адрес_модуля [,uint8_t регистр], uint8_t* массив, uint8_t sum);			//	Пакетное чтение нескольких байт данных из регистров модуля. Если номер регистра не указан, то он и не передаётся.
-	uint8_t readByte		(uint8_t адрес_модуля  ,uint8_t регистр                               );			//	Чтение   одного байта           данных из регистра  модуля.
-	bool	writeBytes		(uint8_t адрес_модуля [,uint8_t регистр], uint8_t* массив, uint8_t sum);			//	Пакетная запись нескольких байт данных в  регистры  модуля. Если номер регистра не указан, то он и не передаётся.
-	bool	writeByte		(uint8_t адрес_модуля  ,uint8_t регистр , uint8_t  байт               );			//	Запись   одного байта           данных в  регистр   модуля.
-	int		read			(void                                                                 );			//	Чтение   одного байта из буфера.
-	void	write			(uint8_t                                                              );			//	Запись   одного байта в  буфер.
-	void	onReceive		(ссылка на void функцию(int )                                         );			//	Указание пользовательской функции обработки получения данных  ведомым от мастера.
-	void	onRequest		(ссылка на void функцию(void)                                         );			//	Указание пользовательской функции обработки получения запроса ведомым от мастера.
+	void	init			(ссылка на объект класса TwoWire или SoftTwoWire						);			//	Выбор аппаратной или программной шины I2C.
+	void	begin			( [ uint8_t адрес]														);			//	Инициализация работы с ранее выбранной шиной I2C. Если адрес указан, то в качестве ведомого.
+	uint8_t	getPinSDA		(void																	);			//	Получение номера вывода SDA.
+	uint8_t	getPinSCL		(void																	);			//	Получение номера вывода SCL.
+	void	setWireTimeout	([uint32_t время в мкс]													);			//	Изменение таймаута ожидания мастером ведомого в мкс. Если параметра нет, то использовать значение по умолчанию.
+	void	setClock		(uint32_t скорость														);			//	Изменение скорости передачи данных в Гц.
+	bool	checkAddress	(uint8_t адрес_модуля													);			//	Проверка наличия ведомого с указанным адресом.
+	bool	readBytes		(uint8_t адрес_модуля [,uint8_t регистр], uint8_t* массив, uint8_t sum	);			//	Пакетное чтение нескольких байт данных из регистров модуля. Если номер регистра не указан, то он и не передаётся.
+	uint8_t readByte		(uint8_t адрес_модуля  ,uint8_t регистр									);			//	Чтение   одного байта           данных из регистра  модуля.
+	bool	writeBytes		(uint8_t адрес_модуля [,uint8_t регистр], uint8_t* массив, uint8_t sum	);			//	Пакетная запись нескольких байт данных в  регистры  модуля. Если номер регистра не указан, то он и не передаётся.
+	bool	writeByte		(uint8_t адрес_модуля  ,uint8_t регистр , uint8_t  байт					);			//	Запись   одного байта           данных в  регистр   модуля.
+	int		read			(void																	);			//	Чтение   одного байта из  буфера (для использования в функции onReceive(int) ).
+	void	write			(uint8_t																);			//	Запись   одного байта в   буфер  (для использования в функции onRequest(void)).
+	int		available		(void																	);			//	Проверка наличия данных в буфере (для использования в функции onReceive(int) ).
+	void	onReceive		(ссылка на void функцию(int )											);			//	Указание пользовательской функции обработки получения данных  ведомым от мастера.
+	void	onRequest		(ссылка на void функцию(void)											);			//	Указание пользовательской функции обработки получения запроса ведомым от мастера.
 **/																												//
 																												//
 //	----------------------------------------------------------------------------------------------				//
@@ -78,8 +79,10 @@
 	#if defined(pin_SW_SDA) || defined(pin_SW_SCL)																//	В ранних версиях реализации программной шины I2C нужно было указывать выводы pin_SW_SDA и pin_SW_SCL.
 		#error Библиотеки iarduino работают с программной шиной I2C через библиотеку iarduino_I2C_Software. Смотрите: файл/примеры/iarduino_I2C...
 	#endif																										//
-	#if defined(iarduino_I2C_Select_Version) && iarduino_I2C_Select_Version<2									//	Если уже подключена библиотека выбора шины I2C с версией ниже 2, то информируем о необходимости обновить библиотеки.
-		#error Ваши библиотеки iarduino для работы с шиной I2C устарели, пожалуйста обновите все используемые библиотеки iarduino.
+	#if defined(iarduino_I2C_Select_Version)																	//	Если уже подключена библиотека выбора шины I2C.
+		#if iarduino_I2C_Select_Version!=3																		//	Если Версия библиотеки отличается, то информируем о необходимости обновить библиотеки.
+			#error Ваши библиотеки iarduino для работы с шиной I2C устарели, пожалуйста обновите все используемые библиотеки iarduino.
+		#endif																									//
 	#endif																										//
 																												//
 //	----------------------------------------------------------------------------------------------				//
@@ -87,7 +90,7 @@
 #ifndef iarduino_I2C_Select_h																					//
 #define iarduino_I2C_Select_h																					//
 																												//
-#define iarduino_I2C_Select_Version 2																			//	Версия данной библиотеки. ИСПОЛЬЗУЕТСЯ НА 81 СТРОКЕ для информирования о наличии устаревших версий.
+#define iarduino_I2C_Select_Version 3																			//	Версия данной библиотеки. ИСПОЛЬЗУЕТСЯ НА 81 СТРОКЕ для информирования о наличии устаревших версий.
 																												//
 //	Если подключена или поддерживается библиотека Wire.h, то разрешаем её использовать:							//
 	#if defined(TwoWire_h) || defined(__ARDUINO_WIRE_IMPLEMENTATION__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega1284P__) || defined(__AVR_ATmega2560__) || defined(ESP8266) || defined(ESP32) || defined(ARDUINO_ARCH_RP2040) || defined(RENESAS_CORTEX_M4) // Если подключена библиотека Wire.h или платы её поддерживают...
@@ -103,31 +106,30 @@
 																												//
 class iarduino_I2C_VirtualSelect{																				//	Определяем полиморфный класс
 	public:																										//
-		virtual bool	readBytes		(uint8_t, uint8_t , uint8_t*, uint8_t);									//	Пакетное чтение нескольких байт данных из регистров модуля	(аргументы: адрес_модуля, адрес_первого_регистра, указатель_на_массив, количество_байт).
-		virtual bool	readBytes		(uint8_t,           uint8_t*, uint8_t);									//	Пакетное чтение нескольких байт данных из           модуля	(аргументы: адрес_модуля,                         указатель_на_массив, количество_байт).
-		virtual uint8_t readByte		(uint8_t, uint8_t                    );									//	Чтение   одного байта           данных из регистра  модуля	(аргументы: адрес_модуля, адрес_регистра                                              ).
-		virtual bool	writeBytes		(uint8_t, uint8_t , uint8_t*, uint8_t);									//	Пакетная запись нескольких байт данных в  регистры  модуля	(аргументы: адрес_модуля, адрес_первого_регистра, указатель_на_массив, количество_байт).
-		virtual bool	writeBytes		(uint8_t,           uint8_t*, uint8_t);									//	Пакетная запись нескольких байт данных в            модуль	(аргументы: адрес_модуля,                         указатель_на_массив, количество_байт).
-		virtual bool	writeByte		(uint8_t, uint8_t , uint8_t          );									//	Запись   одного байта           данных в  регистр   модуля	(аргументы: адрес_модуля, адрес_регистра        , байт_для_записи                     ).
-		virtual bool	checkAddress	(uint8_t                             );									//	Проверка наличия ведомого с указанным адресом				(аргумент : адрес_модуля).
-		virtual void	setClock		(uint32_t                            );									//	Изменение скорости передачи данных							(аргумент : скорость в Гц).
-		virtual void	setWireTimeout	(uint32_t                            );									//	Изменение таймаута ожидания ведомого						(аргумент : timeout_мкс). Если timeout=0 то таймаут отключён.
-		virtual void	setWireTimeout	(void                                );									//	Изменение таймаута ожидания ведомого на значение по умолчанию.
-		virtual uint8_t	getPinSDA		(void                                );									//	Получение номера вывода SDA.
-		virtual uint8_t	getPinSCL		(void                                );									//	Получение номера вывода SCL.
-		virtual void	onReceive		(void (*)(int )                      );									//	Указание пользовательской функции обработки получения данных  ведомым от мастера.
-		virtual void	onRequest		(void (*)(void)                      );									//	Указание пользовательской функции обработки получения запроса ведомым от мастера.
-		virtual int		read			(void                                );									//	Чтение   одного байта из буфера.
-		virtual void	write			(uint8_t                             );									//	Запись   одного байта в  буфер.
-		virtual void	begin			(void                                );									//	Переинициализация шины I2C для мастера.
-		virtual void	begin			(uint8_t                             );									//	Переинициализация шины I2C для ведомого.
+		virtual void	begin			(void									);								//	Инициализация работы с выбранной шиной в качестве мастера.
+		virtual void	begin			(uint8_t								);								//	Инициализация работы с выбранной шиной в качестве ведомого.	(аргумент : адрес ведомого на шине I2C).
+		virtual uint8_t	getPinSDA		(void									);								//	Получение номера вывода SDA.
+		virtual uint8_t	getPinSCL		(void									);								//	Получение номера вывода SCL.
+		virtual void	setWireTimeout	(uint32_t								);								//	Изменение таймаута ожидания ведомого						(аргумент : timeout_мкс). Если timeout=0 то таймаут отключён.
+		virtual void	setWireTimeout	(void									);								//	Изменение таймаута ожидания ведомого на значение по умолчанию.
+		virtual void	setClock		(uint32_t								);								//	Изменение скорости передачи данных							(аргумент : скорость в Гц).
+		virtual bool	checkAddress	(uint8_t								);								//	Проверка наличия ведомого с указанным адресом				(аргумент : адрес_модуля).
+		virtual bool	readBytes		(uint8_t, uint8_t , uint8_t*, uint8_t	);								//	Пакетное чтение нескольких байт данных из регистров модуля	(аргументы: адрес_модуля, адрес_первого_регистра, указатель_на_массив, количество_байт).
+		virtual bool	readBytes		(uint8_t,           uint8_t*, uint8_t	);								//	Пакетное чтение нескольких байт данных из           модуля	(аргументы: адрес_модуля,                         указатель_на_массив, количество_байт).
+		virtual uint8_t readByte		(uint8_t, uint8_t						);								//	Чтение   одного байта           данных из регистра  модуля	(аргументы: адрес_модуля, адрес_регистра                                              ).
+		virtual bool	writeBytes		(uint8_t, uint8_t , uint8_t*, uint8_t	);								//	Пакетная запись нескольких байт данных в  регистры  модуля	(аргументы: адрес_модуля, адрес_первого_регистра, указатель_на_массив, количество_байт).
+		virtual bool	writeBytes		(uint8_t,           uint8_t*, uint8_t	);								//	Пакетная запись нескольких байт данных в            модуль	(аргументы: адрес_модуля,                         указатель_на_массив, количество_байт).
+		virtual bool	writeByte		(uint8_t, uint8_t , uint8_t				);								//	Запись   одного байта           данных в  регистр   модуля	(аргументы: адрес_модуля, адрес_регистра        , байт_для_записи                     ).
+		virtual int		read			(void									);								//	Чтение   одного байта из буфера внутри функции onReceive.
+		virtual void	write			(uint8_t								);								//	Запись   одного байта в  буфер  внутри функции onRequest.	(аргумент : байт для записи в буфер).
+		virtual int		available		(void									);								//	Проверка наличия данных в буфере внутри функции onReceive.
+		virtual void	onReceive		(void (*)(int )							);								//	Указание пользовательской функции обработки получения данных  ведомым от мастера.
+		virtual void	onRequest		(void (*)(void)							);								//	Указание пользовательской функции обработки получения запроса ведомым от мастера.
 		#if defined(I2C_HW_includes)																			//
-		virtual void	begin			(TwoWire*                            );									//	Инициализация работы по аппаратной шине I2C в качестве мастера, с указанием объекта класса TwoWire.
-		virtual void	begin			(TwoWire*, uint8_t                   );									//	Инициализация работы по аппаратной шине I2C в качестве ведомого с указанием объекта класса TwoWire и адреса ведомого.
+		virtual void	init			(TwoWire*								);								//	Выбор аппаратной шины I2C.									(аргумент : объект класса TwoWire).
 		#endif																									//
 		#if defined(I2C_SW_includes)																			//
-		virtual void	begin			(SoftTwoWire*                        );									//	Инициализация работы по программной шине I2C в качестве мастера, с указанием объекта класса SoftTwoWire.
-		virtual void	begin			(SoftTwoWire*, uint8_t               );									//	Инициализация работы по программной шине I2C в качестве ведомого с указанием объекта класса SoftTwoWire и адреса ведомого.
+		virtual void	init			(SoftTwoWire*							);								//	Выбор программной шины I2C.									(аргумент : объект класса SoftTwoWire).
 		#endif																									//
 };																												//
 																												//
@@ -135,17 +137,15 @@ class iarduino_I2C_Select: public iarduino_I2C_VirtualSelect{													//
 																												//
 	public:																										//
 																												//
-	//	Функции инициализации работы с выбранной шиной I2C:														//
+	//	Функции выбора шины I2C:																				//
 		#if defined(I2C_HW_includes)																			//	Если подключена библиотека Wire...
-			void begin(TwoWire*     i           ){ objI2C=i; flgI2CType=1; (*(TwoWire*    )objI2C).begin( ); }	//	Присваиваем указателю objI2C адрес из ссылки i указывающий на объект класса TwoWire.
-			void begin(TwoWire*     i, uint8_t j){ objI2C=i; flgI2CType=1; (*(TwoWire*    )objI2C).begin(j); }	//	Присваиваем указателю objI2C адрес из ссылки i указывающий на объект класса TwoWire.
+			void init (TwoWire*     i){ objI2C=i; flgI2CType=1; }												//	Присваиваем указателю objI2C адрес из ссылки i указывающий на объект класса TwoWire.
 		#endif																									//
 		#if defined(I2C_SW_includes)																			//	Если подключена библиотека iarduino_I2C_Software...
-			void begin(SoftTwoWire* i           ){ objI2C=i; flgI2CType=2; (*(SoftTwoWire*)objI2C).begin( ); }	//	Присваиваем указателю objI2C адрес из ссылки i указывающий на объект класса SoftTwoWire.
-			void begin(SoftTwoWire* i, uint8_t j){ objI2C=i; flgI2CType=2; (*(SoftTwoWire*)objI2C).begin(j); }	//	Присваиваем указателю objI2C адрес из ссылки i указывающий на объект класса SoftTwoWire.
+			void init (SoftTwoWire* i){ objI2C=i; flgI2CType=2; }												//	Присваиваем указателю objI2C адрес из ссылки i указывающий на объект класса SoftTwoWire.
 		#endif																									//
 																												//
-	//	Функции переинициации ранее выбранной шины I2C:															//
+	//	Функции инициализации работы с ранее выбранной шиной I2C:												//
 		void begin(void){																						//
 			#if defined(I2C_HW_includes)																		//
 				if(flgI2CType==1){ (*(TwoWire*    )objI2C).begin(); }											//
@@ -237,6 +237,7 @@ class iarduino_I2C_Select: public iarduino_I2C_VirtualSelect{													//
 			#if defined(I2C_SW_includes)																		//
 				if(flgI2CType==2){ return (*(SoftTwoWire*)objI2C).read(); }										//
 			#endif																								//
+			return 0;																							//
 		}																										//
 																												//
 	//	Функция помещения очередного байта в буфер для передачи ведомому:										//
@@ -247,6 +248,17 @@ class iarduino_I2C_Select: public iarduino_I2C_VirtualSelect{													//
 			#if defined(I2C_SW_includes)																		//
 				if(flgI2CType==2){ (*(SoftTwoWire*)objI2C).write(data); }										//
 			#endif																								//
+		}																										//
+																												//
+	//	Функция возвращает количество байт оставшихся в буфере после чтения:									//
+		int available(void){																					//
+			#if defined(I2C_HW_includes)																		//
+				if(flgI2CType==1){ return (*(TwoWire*    )objI2C).available(); }								//
+			#endif																								//
+			#if defined(I2C_SW_includes)																		//
+				if(flgI2CType==2){ return (*(SoftTwoWire*)objI2C).available(); }								//
+			#endif																								//
+			return 0;																							//
 		}																										//
 																												//
 	//	Функция пакетного чтения нескольких байт данных из регистров модуля:									//
@@ -323,6 +335,7 @@ class iarduino_I2C_Select: public iarduino_I2C_VirtualSelect{													//
 			#if defined(I2C_SW_includes)																		//
 				if(flgI2CType==2){ return (*(SoftTwoWire*)objI2C).write(data,sum); }							//
 			#endif																								//
+			return 0;																							//
 		}																										//
 																												//
 	//	Функция выполнения инициированной ранее передачи данных из буфера ведомому:								//
@@ -333,6 +346,7 @@ class iarduino_I2C_Select: public iarduino_I2C_VirtualSelect{													//
 			#if defined(I2C_SW_includes)																		//
 				if(flgI2CType==2){ return (*(SoftTwoWire*)objI2C).endTransmission(sendStop); }					//
 			#endif																								//
+			return 4;																							//	Возвращает: 0-передача успешна / 1 - переполнен буфер / 2 - получен NACK при передаче адреса / 3 - получен NACK при передаче данных / 4 - другая ошибка / 5 - timeout. В качестве параметра функция endTransmission() может принимать флаг установки стсояния STOP - по умолчанию true.
 		}																										//
 																												//
 	//	Функция выполнения чтения от ведомого указанного количества байт:										//
@@ -343,16 +357,7 @@ class iarduino_I2C_Select: public iarduino_I2C_VirtualSelect{													//
 			#if defined(I2C_SW_includes)																		//
 				if(flgI2CType==2){ return (*(SoftTwoWire*)objI2C).requestFrom(adr,sum); }						//
 			#endif																								//
-		}																										//
-																												//
-	//	Функция возвращает количество байт оставшихся в буфере после чтения:									//
-		int available(void){																					//
-			#if defined(I2C_HW_includes)																		//
-				if(flgI2CType==1){ return (*(TwoWire*    )objI2C).available(); }								//
-			#endif																								//
-			#if defined(I2C_SW_includes)																		//
-				if(flgI2CType==2){ return (*(SoftTwoWire*)objI2C).available(); }								//
-			#endif																								//
+			return 0;																							//
 		}																										//
 																												//
 		void*	objI2C;																							//	Указатель на объект работы с шиной I2C (Wire, Wire1, ..., SoftwareWire).
