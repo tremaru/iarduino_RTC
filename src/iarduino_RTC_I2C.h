@@ -80,7 +80,7 @@
 		#error Библиотеки iarduino работают с программной шиной I2C через библиотеку iarduino_I2C_Software. Смотрите: файл/примеры/iarduino_I2C...
 	#endif																										//
 	#if defined(iarduino_I2C_Select_Version)																	//	Если уже подключена библиотека выбора шины I2C.
-		#if iarduino_I2C_Select_Version!=3																		//	Если Версия библиотеки отличается, то информируем о необходимости обновить библиотеки.
+		#if iarduino_I2C_Select_Version!=4																		//	Если Версия библиотеки отличается, то информируем о необходимости обновить библиотеки.
 			#error Ваши библиотеки iarduino для работы с шиной I2C устарели, пожалуйста обновите все используемые библиотеки iarduino.
 		#endif																									//
 	#endif																										//
@@ -90,7 +90,7 @@
 #ifndef iarduino_I2C_Select_h																					//
 #define iarduino_I2C_Select_h																					//
 																												//
-#define iarduino_I2C_Select_Version 3																			//	Версия данной библиотеки. ИСПОЛЬЗУЕТСЯ НА 81 СТРОКЕ для информирования о наличии устаревших версий.
+#define iarduino_I2C_Select_Version 4																			//	Версия данной библиотеки. ИСПОЛЬЗУЕТСЯ НА 83 СТРОКЕ для информирования о наличии устаревших версий.
 																												//
 //	Если подключена или поддерживается библиотека Wire.h, то разрешаем её использовать:							//
 	#if defined(TwoWire_h) || defined(__ARDUINO_WIRE_IMPLEMENTATION__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega1284P__) || defined(__AVR_ATmega2560__) || defined(ESP8266) || defined(ESP32) || defined(ARDUINO_ARCH_RP2040) || defined(RENESAS_CORTEX_M4) // Если подключена библиотека Wire.h или платы её поддерживают...
@@ -167,7 +167,17 @@ class iarduino_I2C_Select: public iarduino_I2C_VirtualSelect{													//
 		uint8_t getPinSDA(void){																				//
 			int scl=0, sda=0;																					//
 			#if defined(I2C_HW_includes)																		//
-				if(flgI2CType==1){ sda=SDA; }																	//
+				#if defined(I2C_SDA)																			//
+					if(flgI2CType==1){ sda=I2C_SDA; }															//
+				#elif defined(TWI_SDA)																			//
+					if(flgI2CType==1){ sda=TWI_SDA; }															//
+				#elif defined(PIN_WIRE_SDA)																		//
+					if(flgI2CType==1){ sda=PIN_WIRE_SDA; }														//
+				#elif defined(WIRE_SDA_PIN)																		//
+					if(flgI2CType==1){ sda=WIRE_SDA_PIN; }														//
+				#else																							//
+					if(flgI2CType==1){ sda=SDA; }																//
+				#endif																							//
 			#endif																								//
 			#if defined(I2C_SW_includes)																		//
 				if(flgI2CType==2){ (*(SoftTwoWire*)objI2C).getPins(&sda, &scl); }								//
@@ -179,7 +189,17 @@ class iarduino_I2C_Select: public iarduino_I2C_VirtualSelect{													//
 		uint8_t getPinSCL(void){																				//
 			int scl=0, sda=0;																					//
 			#if defined(I2C_HW_includes)																		//
-				if(flgI2CType==1){ scl=SCL; }																	//
+				#if defined(I2C_SCL)																			//
+					if(flgI2CType==1){ scl=I2C_SCL; }															//
+				#elif defined(TWI_SCL)																			//
+					if(flgI2CType==1){ scl=TWI_SCL; }															//
+				#elif defined(PIN_WIRE_SCL)																		//
+					if(flgI2CType==1){ scl=PIN_WIRE_SCL; }														//
+				#elif defined(WIRE_SCL_PIN)																		//
+					if(flgI2CType==1){ scl=WIRE_SCL_PIN; }														//
+				#else																							//
+					if(flgI2CType==1){ scl=SCL; }																//
+				#endif																							//
 			#endif																								//
 			#if defined(I2C_SW_includes)																		//
 				if(flgI2CType==2){ (*(SoftTwoWire*)objI2C).getPins(&sda, &scl); }								//

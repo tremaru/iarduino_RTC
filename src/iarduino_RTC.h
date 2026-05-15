@@ -4,7 +4,7 @@
 //                                                    (на чипе DS3231) https://iarduino.ru/shop/Expansion-payments/chasy-realnogo-vremeni-ds3231.html
 //                                                                     https://iarduino.ru/shop/Expansion-payments/chasy-realnogo-vremeni-rtc-trema-modul-v2-0.html
 //                                                    (на чипе RX8025)
-//  Версия: 2.0.6
+//  Версия: 2.0.7
 //  Последнюю версию библиотеки Вы можете скачать по ссылке: https://iarduino.ru/file/235.html
 //  Подробное описание функции бибилиотеки доступно по ссылке: https://wiki.iarduino.ru/page/chasy-realnogo-vremeni-rtc-trema-modul/
 //  Библиотека является собственностью интернет магазина iarduino.ru и может свободно использоваться и распространяться!
@@ -66,7 +66,7 @@ class iarduino_RTC{																							//
 			}	                 selI2C   = new iarduino_I2C_Select;										//	Переопределяем указатель selI2C на объект производного класса iarduino_I2C_Select.
 		}																									//
 	/**	Пользовательские функции **/																		//
-		#if defined(TwoWire_h) || defined(__ARDUINO_WIRE_IMPLEMENTATION__)									//	Если подключена библиотека Wire.h
+		#if defined(TwoWire_h) || defined(__ARDUINO_WIRE_IMPLEMENTATION__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega1284P__) || defined(__AVR_ATmega2560__) || defined(ESP8266) || defined(ESP32) || defined(ARDUINO_ARCH_RP2040) || defined(RENESAS_CORTEX_M4) // Если подключена библиотека Wire или платы её поддерживают...
 		bool begin (TwoWire* i=&Wire ){ selI2C->init(i); objClass->begin((iarduino_I2C_Select*)selI2C); gettime(); }	//	Определяем функцию инициализации модуля (Параметр: объект для работы с аппаратной шиной I2C).
 		#endif																								//
 		#if defined(iarduino_I2C_Software_h)																//	Если подключена библиотека iarduino_I2C_Software.h
