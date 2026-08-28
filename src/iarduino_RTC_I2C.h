@@ -17,7 +17,7 @@
 /**																												//
 	#include "Название_данного_файла.h"																			//	Подключаем библиотеку выбора реализации шины I2C.
 																												//
-	#if defined(TwoWire_h) || defined(__ARDUINO_WIRE_IMPLEMENTATION__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega1284P__) || defined(__AVR_ATmega2560__) || defined(ESP8266) || defined(ESP32) || defined(ARDUINO_ARCH_RP2040) || defined(RENESAS_CORTEX_M4) // Если подключена библиотека Wire или платы её поддерживают...
+	#if defined(TwoWire_h) || defined(__ARDUINO_WIRE_IMPLEMENTATION__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega1284P__) || defined(__AVR_ATmega2560__) || defined(ESP8266) || defined(ESP32) || defined(ARDUINO_ARCH_RP2040) || defined(RENESAS_CORTEX_M4) // Если подключена библиотека Wire или платы её поддерживают...
 		#include <Wire.h>																						//	Разрешаем использовать библиотеку Wire в данной библиотеке.
 	#endif																										//
 	#if defined( iarduino_I2C_Software_h )																		//	Если библиотека iarduino_I2C_Software подключена в скетче...
@@ -93,7 +93,7 @@
 #define iarduino_I2C_Select_Version 4																			//	Версия данной библиотеки. ИСПОЛЬЗУЕТСЯ НА 83 СТРОКЕ для информирования о наличии устаревших версий.
 																												//
 //	Если подключена или поддерживается библиотека Wire.h, то разрешаем её использовать:							//
-	#if defined(TwoWire_h) || defined(__ARDUINO_WIRE_IMPLEMENTATION__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega1284P__) || defined(__AVR_ATmega2560__) || defined(ESP8266) || defined(ESP32) || defined(ARDUINO_ARCH_RP2040) || defined(RENESAS_CORTEX_M4) // Если подключена библиотека Wire.h или платы её поддерживают...
+	#if defined(TwoWire_h) || defined(__ARDUINO_WIRE_IMPLEMENTATION__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega1284P__) || defined(__AVR_ATmega2560__) || defined(ESP8266) || defined(ESP32) || defined(ARDUINO_ARCH_RP2040) || defined(RENESAS_CORTEX_M4) // Если подключена библиотека Wire.h или платы её поддерживают...
 		#define I2C_HW_includes																					//	Идентификатор разрешения работы с библиотекой Wire.h
 		#include <Wire.h>																						//	Разрешаем использовать библиотеку Wire.h в данной библиотеке.
 	#endif																										//
