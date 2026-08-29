@@ -13,6 +13,7 @@ class iarduino_RTC_DS1302: public iarduino_RTC_BASE{											//
 	/**	функции доступные пользователю **/														//
 	//	Инициализация модуля:																	//
 		void	begin(iarduino_I2C_Select* i){													//	(указатель для совместимости с часами работающими по шине I2C)
+					(void)(i);																	//	Избавляемся от предупреждения неиспользуемом параметре.
 				//	Инициализация работы с трехпроводной шиной:									//
 					funcBegin();																//	(без параметров)
 				//	Установка флагов управления и состояния модуля:								//
@@ -63,8 +64,8 @@ class iarduino_RTC_DS1302: public iarduino_RTC_BASE{											//
 		}																						//
 																								//
 	/**	функции для работы с трехпроводной шиной **/											//
-		void	funcWriteByte	(uint8_t j)														/*	Передача  одного байта		(байт для передачи)									*/	{uint8_t i=0, n=500/busRate+1; pinMode(pinDAT, OUTPUT); while(i>=0 && i<8){digitalWrite(pinDAT, (j & _BV(i))); delayMicroseconds(n); digitalWrite(pinCLK, 1); delayMicroseconds(n); digitalWrite(pinCLK, 0); i++;} pinMode(pinDAT, INPUT);}
-		uint8_t	funcReadByte	(bool j)														/*	Получение одного байта		(флаг чтения предустановленного бита с линии DAT)	*/	{uint8_t i=0, k=0, n=500/busRate+1; pinMode(pinDAT, INPUT); if(j){if(digitalRead(pinDAT)){k |= _BV(i);} i++;} while(i>=0 && i<8){digitalWrite(pinCLK, 1); delayMicroseconds(n); digitalWrite(pinCLK, 0); delayMicroseconds(n); if(digitalRead(pinDAT)){k |= _BV(i);} i++;} return k;}
+		void	funcWriteByte	(uint8_t j)														/*	Передача  одного байта		(байт для передачи)									*/	{uint8_t i=0, n=500/busRate+1; pinMode(pinDAT, OUTPUT); while(i<8){digitalWrite(pinDAT, (j & _BV(i))); delayMicroseconds(n); digitalWrite(pinCLK, 1); delayMicroseconds(n); digitalWrite(pinCLK, 0); i++;} pinMode(pinDAT, INPUT);}
+		uint8_t	funcReadByte	(bool j)														/*	Получение одного байта		(флаг чтения предустановленного бита с линии DAT)	*/	{uint8_t i=0, k=0, n=500/busRate+1; pinMode(pinDAT, INPUT); if(j){if(digitalRead(pinDAT)){k |= _BV(i);} i++;} while(i<8){digitalWrite(pinCLK, 1); delayMicroseconds(n); digitalWrite(pinCLK, 0); delayMicroseconds(n); if(digitalRead(pinDAT)){k |= _BV(i);} i++;} return k;}
 		void	funcBegin		(void)															/*	Подготовка выводов шины		(без параметров)									*/	{pinMode(pinRES, OUTPUT); pinMode(pinCLK, OUTPUT); pinMode(pinDAT, INPUT); digitalWrite(pinCLK, 0); digitalWrite(pinRES, 0);}
 };																								//
 																								//

@@ -17,7 +17,7 @@
 /**																												//
 	#include "Название_данного_файла.h"																			//	Подключаем библиотеку выбора реализации шины I2C.
 																												//
-	#if defined(TwoWire_h) || defined(__ARDUINO_WIRE_IMPLEMENTATION__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega1284P__) || defined(__AVR_ATmega2560__) || defined(ESP8266) || defined(ESP32) || defined(ARDUINO_ARCH_RP2040) || defined(RENESAS_CORTEX_M4) // Если подключена библиотека Wire или платы её поддерживают...
+	#if defined(TwoWire_h) || defined(__ARDUINO_WIRE_IMPLEMENTATION__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega1284P__) || defined(__AVR_ATmega2560__) || defined(ESP8266) || defined(ESP32) || defined(ARDUINO_ARCH_RP2040) || defined(RENESAS_CORTEX_M4) // Если подключена библиотека Wire.h или платы её поддерживают...
 		#include <Wire.h>																						//	Разрешаем использовать библиотеку Wire в данной библиотеке.
 	#endif																										//
 	#if defined( iarduino_I2C_Software_h )																		//	Если библиотека iarduino_I2C_Software подключена в скетче...
@@ -80,17 +80,23 @@
 		#error Библиотеки iarduino работают с программной шиной I2C через библиотеку iarduino_I2C_Software. Смотрите: файл/примеры/iarduino_I2C...
 	#endif																										//
 	#if defined(iarduino_I2C_Select_Version)																	//	Если уже подключена библиотека выбора шины I2C.
-		#if iarduino_I2C_Select_Version!=4																		//	Если Версия библиотеки отличается, то информируем о необходимости обновить библиотеки.
+		#if iarduino_I2C_Select_Version!=5																		//	Если Версия библиотеки отличается, то информируем о необходимости обновить библиотеки.
 			#error Ваши библиотеки iarduino для работы с шиной I2C устарели, пожалуйста обновите все используемые библиотеки iarduino.
 		#endif																									//
 	#endif																										//
+																												//
+//	Version 1:	Реализована возможность создания одной программной шины I2C с указанием её выводов.				//
+//	Version 2:	Исправлены ошибки.																				//
+//	Version 3:	Исправлены ошибки.																				//
+//	Version 4:	Добавлена библиотека iarduino_I2C_Software.h для создания нескольких программных шин I2C.		//
+//	Version 5:	Исключены предупреждения компилятора о неиспользуемых переменных и параметрах.					//
 																												//
 //	----------------------------------------------------------------------------------------------				//
 																												//
 #ifndef iarduino_I2C_Select_h																					//
 #define iarduino_I2C_Select_h																					//
 																												//
-#define iarduino_I2C_Select_Version 4																			//	Версия данной библиотеки. ИСПОЛЬЗУЕТСЯ НА 83 СТРОКЕ для информирования о наличии устаревших версий.
+#define iarduino_I2C_Select_Version 5																			//	Версия данной библиотеки. ИСПОЛЬЗУЕТСЯ НА 83 СТРОКЕ для информирования о наличии устаревших версий.
 																												//
 //	Если подключена или поддерживается библиотека Wire.h, то разрешаем её использовать:							//
 	#if defined(TwoWire_h) || defined(__ARDUINO_WIRE_IMPLEMENTATION__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega1284P__) || defined(__AVR_ATmega2560__) || defined(ESP8266) || defined(ESP32) || defined(ARDUINO_ARCH_RP2040) || defined(RENESAS_CORTEX_M4) // Если подключена библиотека Wire.h или платы её поддерживают...
@@ -161,11 +167,17 @@ class iarduino_I2C_Select: public iarduino_I2C_VirtualSelect{													//
 			#if defined(I2C_SW_includes)																		//
 				if(flgI2CType==2){ (*(SoftTwoWire*)objI2C).begin(adr); }										//
 			#endif																								//
+			#if !defined(I2C_HW_includes) && !defined(I2C_SW_includes)											//
+				(void)(adr);																					//	Избавляемся от предупреждения неиспользуемого параметра.
+			#endif																								//
 		}																										//
 																												//
 	//	Функция получения номера вывода SDA:																	//
 		uint8_t getPinSDA(void){																				//
-			int scl=0, sda=0;																					//
+			#if defined(I2C_SW_includes)																		//
+			int scl=0;																							//
+			#endif																								//
+			int sda=0;																							//
 			#if defined(I2C_HW_includes)																		//
 				#if defined(I2C_SDA)																			//
 					if(flgI2CType==1){ sda=I2C_SDA; }															//
@@ -187,7 +199,10 @@ class iarduino_I2C_Select: public iarduino_I2C_VirtualSelect{													//
 																												//
 	//	Функция получения номера вывода SCL:																	//
 		uint8_t getPinSCL(void){																				//
-			int scl=0, sda=0;																					//
+			#if defined(I2C_SW_includes)																		//
+			int sda=0;																							//
+			#endif																								//
+			int scl=0;																							//
 			#if defined(I2C_HW_includes)																		//
 				#if defined(I2C_SCL)																			//
 					if(flgI2CType==1){ scl=I2C_SCL; }															//
@@ -211,6 +226,8 @@ class iarduino_I2C_Select: public iarduino_I2C_VirtualSelect{													//
 		void setWireTimeout(uint32_t timeout){	//	Если timeout=0 мкс, то таймаут отключён.					//
 			#if defined(I2C_SW_includes)																		//
 				if(flgI2CType==2){ (*(SoftTwoWire*)objI2C).setWireTimeout(timeout); }							//
+			#else																								//
+				(void)(timeout);																				//	Избавляемся от предупреждения неиспользуемого параметра.
 			#endif																								//
 		}																										//
 		void setWireTimeout(void){	//	использовать время таймаута по умолчанию.								//
@@ -227,15 +244,21 @@ class iarduino_I2C_Select: public iarduino_I2C_VirtualSelect{													//
 			#if defined(I2C_SW_includes)																		//
 				if(flgI2CType==2){ (*(SoftTwoWire*)objI2C).setClock(speed); }									//
 			#endif																								//
+			#if !defined(I2C_HW_includes) && !defined(I2C_SW_includes)											//
+				(void)(speed);																					//	Избавляемся от предупреждения неиспользуемого параметра.
+			#endif																								//
 		}																										//
 																												//
 	//	Функция указания пользовательской функции обработки получения данных ведомым от мастера:				//
-		void onReceive(void (*func)(int )){																		//
+		void onReceive(void (*func)(int)){																		//
 			#if defined(I2C_HW_includes)																		//
 				if(flgI2CType==1){ (*(TwoWire*    )objI2C).onReceive(func); }									//
 			#endif																								//
 			#if defined(I2C_SW_includes)																		//
 				if(flgI2CType==2){ (*(SoftTwoWire*)objI2C).onReceive(func); }									//
+			#endif																								//
+			#if !defined(I2C_HW_includes) && !defined(I2C_SW_includes)											//
+				(void)(func);																					//	Избавляемся от предупреждения неиспользуемого параметра.
 			#endif																								//
 		}																										//
 																												//
@@ -246,6 +269,9 @@ class iarduino_I2C_Select: public iarduino_I2C_VirtualSelect{													//
 			#endif																								//
 			#if defined(I2C_SW_includes)																		//
 				if(flgI2CType==2){ (*(SoftTwoWire*)objI2C).onRequest(func); }									//
+			#endif																								//
+			#if !defined(I2C_HW_includes) && !defined(I2C_SW_includes)											//
+				(void)(func);																					//	Избавляемся от предупреждения неиспользуемого параметра.
 			#endif																								//
 		}																										//
 																												//
@@ -267,6 +293,9 @@ class iarduino_I2C_Select: public iarduino_I2C_VirtualSelect{													//
 			#endif																								//
 			#if defined(I2C_SW_includes)																		//
 				if(flgI2CType==2){ (*(SoftTwoWire*)objI2C).write(data); }										//
+			#endif																								//
+			#if !defined(I2C_HW_includes) && !defined(I2C_SW_includes)											//
+				(void)(data);																					//	Избавляемся от предупреждения неиспользуемого параметра.
 			#endif																								//
 		}																										//
 																												//
@@ -345,6 +374,9 @@ class iarduino_I2C_Select: public iarduino_I2C_VirtualSelect{													//
 			#if defined(I2C_SW_includes)																		//
 				if(flgI2CType==2){ (*(SoftTwoWire*)objI2C).beginTransmission(adr); }							//
 			#endif																								//
+			#if !defined(I2C_HW_includes) && !defined(I2C_SW_includes)											//
+				(void)(adr);																					//	Избавляемся от предупреждения неиспользуемого параметра.
+			#endif																								//
 		}																										//
 																												//
 	//	Функция помещения массива байт в буфер для передачи ведомому:											//
@@ -354,6 +386,10 @@ class iarduino_I2C_Select: public iarduino_I2C_VirtualSelect{													//
 			#endif																								//
 			#if defined(I2C_SW_includes)																		//
 				if(flgI2CType==2){ return (*(SoftTwoWire*)objI2C).write(data,sum); }							//
+			#endif																								//
+			#if !defined(I2C_HW_includes) && !defined(I2C_SW_includes)											//
+				(void)(data);																					//	Избавляемся от предупреждения неиспользуемого параметра.
+				(void)(sum);																					//	Избавляемся от предупреждения неиспользуемого параметра.
 			#endif																								//
 			return 0;																							//
 		}																										//
@@ -366,6 +402,9 @@ class iarduino_I2C_Select: public iarduino_I2C_VirtualSelect{													//
 			#if defined(I2C_SW_includes)																		//
 				if(flgI2CType==2){ return (*(SoftTwoWire*)objI2C).endTransmission(sendStop); }					//
 			#endif																								//
+			#if !defined(I2C_HW_includes) && !defined(I2C_SW_includes)											//
+				(void)(sendStop);																				//	Избавляемся от предупреждения неиспользуемого параметра.
+			#endif																								//
 			return 4;																							//	Возвращает: 0-передача успешна / 1 - переполнен буфер / 2 - получен NACK при передаче адреса / 3 - получен NACK при передаче данных / 4 - другая ошибка / 5 - timeout. В качестве параметра функция endTransmission() может принимать флаг установки стсояния STOP - по умолчанию true.
 		}																										//
 																												//
@@ -376,6 +415,10 @@ class iarduino_I2C_Select: public iarduino_I2C_VirtualSelect{													//
 			#endif																								//
 			#if defined(I2C_SW_includes)																		//
 				if(flgI2CType==2){ return (*(SoftTwoWire*)objI2C).requestFrom(adr,sum); }						//
+			#endif																								//
+			#if !defined(I2C_HW_includes) && !defined(I2C_SW_includes)											//
+				(void)(adr);																					//	Избавляемся от предупреждения неиспользуемого параметра.
+				(void)(sum);																					//	Избавляемся от предупреждения неиспользуемого параметра.
 			#endif																								//
 			return 0;																							//
 		}																										//

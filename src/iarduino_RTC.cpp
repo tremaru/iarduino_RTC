@@ -3,7 +3,7 @@
 //		Вывод даты и времени
 char*	iarduino_RTC::gettime(String i){char j[i.length()+1]; i.toCharArray(j, i.length()); j[i.length()]=0; return gettime(j);}
 char*	iarduino_RTC::gettime(const char* i){
-			uint8_t j, k, n; bool f;																		//	Объявляем локальные переменные
+			uint8_t j, k, n;																				//	Объявляем локальные переменные
 			if(valRequest > millis()){valRequest=0;}														//	Избавляемся от переполнения millis()
 //			Получаем текущее время:
 			if(valPeriod == 0)											{funcReadTime();}else				//	Если минимальный период опроса модуля == 0 минут, то получаем время из регистров модуля, иначе ...
